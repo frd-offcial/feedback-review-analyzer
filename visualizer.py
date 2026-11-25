@@ -3,7 +3,7 @@ from matplotlib.figure import Figure
 
 
 def create_sentiment_figure(summary: dict) -> Figure:
-    """Creates a Matplotlib bar chart of Positive, Neutral, and Negative counts."""
+
     fig = Figure(figsize=(5.5, 3.8), dpi=100)
     ax = fig.add_subplot(111)
 
@@ -33,7 +33,7 @@ def create_sentiment_figure(summary: dict) -> Figure:
 
 
 def create_drift_figure(monthly_drift: pd.Series) -> Figure:
-    """Creates a Matplotlib line chart of monthly average sentiment (drift)."""
+
     fig = Figure(figsize=(5.5, 3.8), dpi=100)
     ax = fig.add_subplot(111)
 
@@ -68,7 +68,7 @@ def create_drift_figure(monthly_drift: pd.Series) -> Figure:
 
 
 def export_to_csv(df: pd.DataFrame, filepath: str) -> None:
-    """Exports the analyzed and redacted DataFrame to a CSV file."""
+
     df.to_csv(filepath, index=False, encoding="utf-8")
 import pandas as pd
 from matplotlib.figure import Figure
@@ -81,7 +81,7 @@ GRID_COLOR = "#334155"
 
 
 def _style_axes(ax):
-    """Applies a clean, modern dark theme to Matplotlib axes."""
+
     ax.set_facecolor(BG_CARD)
     ax.tick_params(colors=TEXT_MUTED, labelsize=9)
     ax.xaxis.label.set_color(TEXT_MUTED)
@@ -94,7 +94,7 @@ def _style_axes(ax):
 
 
 def create_sentiment_figure(summary: dict) -> Figure:
-    """Creates a side-by-side Sentiment Bar Chart and Donut Chart."""
+
     fig = Figure(figsize=(8.2, 3.8), dpi=100, facecolor=BG_CARD)
 
     labels = ["Positive", "Neutral", "Negative"]
@@ -160,7 +160,7 @@ def create_sentiment_figure(summary: dict) -> Figure:
 
 
 def create_drift_figure(monthly_drift: pd.Series) -> Figure:
-    """Creates an area-shaded Monthly Sentiment Drift line chart."""
+
     fig = Figure(figsize=(6.0, 3.8), dpi=100, facecolor=BG_CARD)
     ax = fig.add_subplot(111)
     _style_axes(ax)
@@ -197,5 +197,5 @@ def create_drift_figure(monthly_drift: pd.Series) -> Figure:
 
 
 def export_to_csv(df: pd.DataFrame, filepath: str) -> None:
-    """Exports the analyzed and redacted DataFrame to a CSV file."""
+
     df.to_csv(filepath, index=False, encoding="utf-8")
