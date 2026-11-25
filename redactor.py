@@ -8,10 +8,7 @@ PHONE_PATTERN = re.compile(r'(\+?\d{1,3}[\s.-]?)?(\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?
 
 
 def redact_text(text: str) -> tuple[str, int]:
-    """
-    Masks emails, URLs, and phone numbers in a single review string.
-    Returns: (redacted_text, count_of_redactions)
-    """
+
     if not isinstance(text, str):
         return "", 0
 
@@ -30,11 +27,7 @@ def redact_text(text: str) -> tuple[str, int]:
 
 
 def load_and_redact_csv(filepath: str, text_col: str = None) -> tuple[pd.DataFrame, int]:
-    """
-    Loads a CSV file, detects the review text column if not specified,
-    removes empty reviews, and applies PII redaction to every review.
-    Returns: (cleaned_dataframe, total_pii_redacted)
-    """
+
     df = pd.read_csv(filepath, encoding="utf-8", on_bad_lines="skip")
 
    
