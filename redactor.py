@@ -1,7 +1,7 @@
 import re
 import pandas as pd
 
-# Compiled regex patterns for PII detection
+
 EMAIL_PATTERN = re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b')
 URL_PATTERN = re.compile(r'(https?://\S+|www\.\S+)', re.IGNORECASE)
 PHONE_PATTERN = re.compile(r'(\+?\d{1,3}[\s.-]?)?(\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}|\b\d{10}\b)')
@@ -37,7 +37,7 @@ def load_and_redact_csv(filepath: str, text_col: str = None) -> tuple[pd.DataFra
     """
     df = pd.read_csv(filepath, encoding="utf-8", on_bad_lines="skip")
 
-    # Auto-detect common review text column names if not explicitly passed
+   
     if text_col is None:
         possible_cols = ["review", "review_text", "text", "comment", "content", "feedback"]
         for col in df.columns:
@@ -49,12 +49,11 @@ def load_and_redact_csv(filepath: str, text_col: str = None) -> tuple[pd.DataFra
                 f"Could not find a review text column. Available columns: {list(df.columns)}"
             )
 
-    # Drop rows with missing review text
     df = df.dropna(subset=[text_col]).copy()
     df[text_col] = df[text_col].astype(str).str.strip()
     df = df[df[text_col] != ""].reset_index(drop=True)
 
-    # Apply PII redaction
+   
     results = df[text_col].apply(redact_text)
     df["redacted_text"] = results.apply(lambda x: x[0])
     df["pii_count"] = results.apply(lambda x: x[1])
@@ -63,7 +62,7 @@ def load_and_redact_csv(filepath: str, text_col: str = None) -> tuple[pd.DataFra
     return df, total_pii_redacted
 
 
-# Independent test block for Member 1
+
 if __name__ == "__main__":
     sample_reviews = [
         "App crashes every time! Mail me at user123@example.com for logs.",
