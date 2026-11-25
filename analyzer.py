@@ -3,17 +3,18 @@ from collections import Counter
 import pandas as pd
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
-# Common English stopwords to ignore when extracting complaint keywords
-STOPWORDS = {
-    "the", "and", "for", "that", "this", "with", "have", "from", "they", "will",
-    "would", "there", "their", "what", "about", "which", "when", "make", "like",
-    "time", "just", "know", "take", "into", "year", "your", "good", "some",
-    "could", "them", "other", "than", "then", "look", "only", "come", "over",
-    "think", "also", "back", "after", "work", "first", "well", "even", "want",
-    "because", "these", "give", "most", "very", "been", "were", "was", "are",
-    "not", "but", "all", "can", "had", "her", "one", "our", "out", "you", "his",
-    "has", "its", "get", "app", "really", "still", "every", "much", "more",
-    "email", "redacted", "url", "phone", "dont", "cant", "wont", "doesnt"
+
+COMPLAINT_THEMES = {
+    "Updates & Changes": ["update", "updated", "version", "downgrade", "ruined", "changed"],
+    "Bugs & Errors": ["bug", "bugs", "error", "glitch", "broken", "issue", "issues", "fix"],
+    "Sync & Calendar": ["sync", "syncing", "calendar", "google", "backup", "cloud"],
+    "Pricing & Paywall": ["pay", "paid", "subscription", "price", "premium", "money", "charge", "charged", "free"],
+    "Crash & Freeze": ["crash", "crashes", "crashing", "freeze", "freezes", "freezing", "stuck", "hang"],
+    "Notifications & Alerts": ["notification", "notifications", "reminder", "reminders", "alarm", "alert", "spam"],
+    "Login & Account": ["login", "sign", "signin", "account", "password", "register", "access"],
+    "Slow & Performance": ["slow", "lag", "laggy", "loading", "battery", "drain", "heavy"],
+    "Data Loss & Delete": ["lost", "delete", "deleted", "disappeared", "missing", "gone", "wipe"],
+    "Ads & Popups": ["ad", "ads", "advert", "popup", "popups", "annoying"],
 }
 
 
@@ -50,27 +51,30 @@ def analyze_sentiment(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
 
 
 def extract_negative_themes(
-    df: pd.DataFrame, top_n: int = 5, max_examples: int = 3
+    df: pd.DataFrame, top_n: int = 8, max_examples: int = 3
 ) -> tuple[list[tuple[str, int]], dict[str, list[str]]]:
     """
-    Finds the top frequent keywords in Negative reviews and maps each
-    keyword to real redacted example reviews.
-    Returns: ([(keyword, count), ...], {keyword: [example_reviews]})
+    Groups Negative reviews into actionable complaint themes and maps each
+    theme to real redacted example reviews.
+    Returns: ([(theme_name, count), ...], {theme_name: [example_reviews]})
     """
     neg_reviews = df[df["sentiment"] == "Negative"]["redacted_text"].tolist()
-    word_counts = Counter()
+
+    # Pre-compile one regex pattern per theme for fast matching
+    compiled_patterns = {
+        theme: re.compile(r"\b(" + "|".join(re.escape(w) for w in words) + r")\b", re.IGNORECASE)
+        for theme, words in COMPLAINT_THEMES.items()
+    }
+
+    theme_counts = Counter()
+    examples = {theme: [] for theme in COMPLAINT_THEMES}
 
     for review in neg_reviews:
-        words = re.findall(r"\b[a-z]{3,}\b", review.lower())
-        filtered = [w for w in words if w not in STOPWORDS]
-        word_counts.update(filtered)
+        for theme, pattern in compiled_patterns.items():
+            if pattern.search(review):
+                theme_counts[theme] += 1
+                if len(examples[theme]) < max_examples:
+                    examples[theme].append(review)
 
-    top_keywords = word_counts.most_common(top_n)
-
-    examples = {}
-    for keyword, _ in top_keywords:
-        pattern = re.compile(rf"\b{re.escape(keyword)}\b", re.IGNORECASE)
-        matched = [rev for rev in neg_reviews if pattern.search(rev)]
-        examples[keyword] = matched[:max_examples]
-
-    return top_keywords, examples
+    top_themes = theme_counts.most_common(top_n)
+    return top_themes, examples
