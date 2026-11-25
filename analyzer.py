@@ -19,11 +19,7 @@ COMPLAINT_THEMES = {
 
 
 def analyze_sentiment(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
-    """
-    Runs VADER sentiment analysis on 'redacted_text'.
-    Adds 'compound_score' and 'sentiment' columns to the DataFrame.
-    Returns: (updated_df, sentiment_counts_dict)
-    """
+
     sia = SentimentIntensityAnalyzer()
     df = df.copy()
 
@@ -53,11 +49,7 @@ def analyze_sentiment(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
 def extract_negative_themes(
     df: pd.DataFrame, top_n: int = 8, max_examples: int = 3
 ) -> tuple[list[tuple[str, int]], dict[str, list[str]]]:
-    """
-    Groups Negative reviews into actionable complaint themes and maps each
-    theme to real redacted example reviews.
-    Returns: ([(theme_name, count), ...], {theme_name: [example_reviews]})
-    """
+
     neg_reviews = df[df["sentiment"] == "Negative"]["redacted_text"].tolist()
 
     # Pre-compile one regex pattern per theme for fast matching
