@@ -10,7 +10,6 @@ from analyzer import analyze_sentiment, extract_negative_themes, COMPLAINT_THEME
 from metrics import compute_validation, compute_monthly_drift
 from visualizer import create_sentiment_figure, create_drift_figure, export_to_csv
 
-# Modern Dark Palette ("Midnight Slate")
 BG_DARK = "#0F172A"
 BG_SIDEBAR = "#111827"
 BG_CARD = "#1E293B"
@@ -72,12 +71,10 @@ class ReviewAnalyzerApp:
         )
 
     def _build_layout(self):
-        # 1. Left Sidebar
         sidebar = tk.Frame(self.root, bg=BG_SIDEBAR, width=230)
         sidebar.pack(side="left", fill="y")
         sidebar.pack_propagate(False)
 
-        # Brand Header
         brand_frame = tk.Frame(sidebar, bg=BG_SIDEBAR, pady=22, padx=18)
         brand_frame.pack(fill="x")
         tk.Label(
@@ -89,10 +86,8 @@ class ReviewAnalyzerApp:
             font=("Segoe UI", 9)
         ).pack(anchor="w", pady=(2, 0))
 
-        # Divider
         tk.Frame(sidebar, bg=BORDER, height=1).pack(fill="x", padx=16, pady=(0, 14))
 
-        # Navigation Menu
         nav_items = [
             ("overview", "  Sentiment Overview"),
             ("themes", "  Complaint Themes"),
@@ -118,7 +113,6 @@ class ReviewAnalyzerApp:
             btn.pack(fill="x", padx=10, pady=3)
             self.nav_buttons[key] = btn
 
-        # Bottom Action Controls in Sidebar
         bottom_box = tk.Frame(sidebar, bg=BG_SIDEBAR, padx=14, pady=18)
         bottom_box.pack(side="bottom", fill="x")
 
@@ -163,14 +157,11 @@ class ReviewAnalyzerApp:
         )
         self.export_btn.pack(fill="x")
 
-        # 2. Main Content Area
         main_area = tk.Frame(self.root, bg=BG_DARK, padx=22, pady=18)
         main_area.pack(side="left", expand=True, fill="both")
 
-        # Top KPI Strip
         self._build_kpi_cards(main_area)
 
-        # Page Container
         self.page_container = tk.Frame(main_area, bg=BG_DARK)
         self.page_container.pack(expand=True, fill="both", pady=(16, 0))
 
@@ -197,7 +188,6 @@ class ReviewAnalyzerApp:
             card = tk.Frame(kpi_row, bg=BG_CARD)
             card.pack(side="left", expand=True, fill="x", padx=(0 if idx == 0 else 8, 0))
 
-            # Colored Top Accent Bar
             tk.Frame(card, bg=color, height=3).pack(fill="x")
 
             body = tk.Frame(card, bg=BG_CARD, padx=14, pady=10)
@@ -237,7 +227,6 @@ class ReviewAnalyzerApp:
         page = tk.Frame(self.page_container, bg=BG_DARK)
         self.pages["themes"] = page
 
-        # Left Card: Ranked Themes Table
         left_card = tk.Frame(page, bg=BG_CARD, padx=14, pady=14)
         left_card.pack(side="left", fill="y", padx=(0, 12))
 
@@ -260,7 +249,6 @@ class ReviewAnalyzerApp:
         self.tree.pack(expand=True, fill="y")
         self.tree.bind("<<TreeviewSelect>>", self.show_theme_examples)
 
-        # Right Card: Traceable Redacted Examples
         right_card = tk.Frame(page, bg=BG_CARD, padx=16, pady=14)
         right_card.pack(side="left", expand=True, fill="both")
 
@@ -292,7 +280,6 @@ class ReviewAnalyzerApp:
         page = tk.Frame(self.page_container, bg=BG_DARK)
         self.pages["metrics"] = page
 
-        # Left Card: Drift Chart
         drift_card = tk.Frame(page, bg=BG_CARD, padx=12, pady=12)
         drift_card.pack(side="left", expand=True, fill="both", padx=(0, 12))
         self.drift_frame = tk.Frame(drift_card, bg=BG_CARD)
@@ -302,7 +289,6 @@ class ReviewAnalyzerApp:
             bg=BG_CARD, fg=TEXT_MUTED, font=("Segoe UI", 10)
         ).pack(expand=True)
 
-        # Right Card: Visual Accuracy & Confusion Matrix
         val_card = tk.Frame(page, bg=BG_CARD, padx=16, pady=16, width=320)
         val_card.pack(side="right", fill="y")
         val_card.pack_propagate(False)
@@ -328,7 +314,6 @@ class ReviewAnalyzerApp:
         self.cm_container.pack(fill="x", pady=(4, 0))
 
     def _build_tester_page(self):
-        """Unique Interactive Viva Feature: Test any review live."""
         page = tk.Frame(self.page_container, bg=BG_CARD, padx=20, pady=18)
         self.pages["tester"] = page
 
@@ -458,11 +443,9 @@ class ReviewAnalyzerApp:
             self.kpi_vars["PII"].set(f"{pii_count:,}")
             self.kpi_sub_vars["PII"].set("Emails / Phones / URLs")
 
-            # Charts
             self._embed_figure(self.overview_chart_holder, create_sentiment_figure(summary))
             self._embed_figure(self.drift_frame, create_drift_figure(monthly_drift))
 
-            # Themes Table
             for row in self.tree.get_children():
                 self.tree.delete(row)
             for theme, cnt in top_themes:
@@ -473,7 +456,6 @@ class ReviewAnalyzerApp:
                 self.tree.selection_set(first_id)
                 self.show_theme_examples(None)
 
-            # Validation
             if accuracy is not None:
                 self.acc_var.set(f"{accuracy}%")
                 self.acc_sub_var.set("VADER agreement with dataset ratings/labels")
@@ -500,7 +482,6 @@ class ReviewAnalyzerApp:
 
         for idx, rev in enumerate(examples, 1):
             self.examples_box.insert(tk.END, f"Example #{idx}\n", "badge")
-            # Highlight [REDACTED] tags if present
             parts = re.split(r"(\[(?:EMAIL|URL|PHONE) REDACTED\])", rev)
             for part in parts:
                 tag = "redacted" if part.endswith("REDACTED]") else None
