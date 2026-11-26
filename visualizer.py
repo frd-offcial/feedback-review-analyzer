@@ -73,7 +73,6 @@ def export_to_csv(df: pd.DataFrame, filepath: str) -> None:
 import pandas as pd
 from matplotlib.figure import Figure
 
-# Shared Dark Theme Palette
 BG_CARD = "#1E293B"
 TEXT_MAIN = "#F8FAFC"
 TEXT_MUTED = "#94A3B8"
@@ -105,7 +104,6 @@ def create_sentiment_figure(summary: dict) -> Figure:
     ]
     colors = ["#10B981", "#F59E0B", "#F43F5E"]
 
-    # Left subplot: Bar Chart
     ax1 = fig.add_subplot(121)
     _style_axes(ax1)
     bars = ax1.bar(labels, values, color=colors, width=0.52, zorder=3)
@@ -129,7 +127,6 @@ def create_sentiment_figure(summary: dict) -> Figure:
             color=TEXT_MAIN,
         )
 
-    # Right subplot: Donut Chart
     ax2 = fig.add_subplot(122)
     ax2.set_facecolor(BG_CARD)
     total = sum(values)
@@ -187,7 +184,6 @@ def create_drift_figure(monthly_drift: pd.Series) -> Figure:
     ax.set_xlabel("Month")
     ax.grid(True, linestyle="--", color=GRID_COLOR, alpha=0.5, zorder=0)
 
-    # Keep x-axis readable if there are many months
     step = max(1, len(labels) // 8)
     ax.set_xticks(x[::step])
     ax.set_xticklabels(labels[::step], rotation=30, ha="right")
